@@ -2,7 +2,9 @@ package com.liutao.nacos;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,4 +42,46 @@ public class DemoController {
         String result = restTemplate.getForObject(url,String.class);
         return "Invoke:"+url + ",return : "+result;
     }
+
+    /**#######################################消费服务的示例#################################################*/
+
+    /**
+     * 创建支持负载均衡的restTemplate
+     *
+     * @return
+     */
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate(){
+        return new RestTemplate();
+    }
+
+
+    @Autowired
+    RestTemplate restTemplate;
+
+    @GetMapping("/consumer/demo")
+    public String testConsumer(@RequestParam("type") String type) {
+        String result = null;
+
+        switch (type){
+            case "restTemplate" :result =  "Return : " + testRestTemplate();
+            break;
+        }
+
+        return result;
+    }
+
+    /**
+     * (1)使用RestTemplate来消费
+     *
+     * 在真正调用的时候，Spring Cloud会将请求拦截下来，然后通过负载均衡器选出节点，并替换服务名部分为具体的ip和端口，
+     * 从而实现基于服务名的负载均衡调用。
+     * @return
+     */
+    private String testRestTemplate(){
+        String result = restTemplate.getForObject("http://alibaba-nacos/hello?name=liutao", String.class);
+        return result;
+    }
+
 }
