@@ -1,11 +1,11 @@
 package com.liutao.nacos;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.context.annotation.Bean;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +20,9 @@ import reactor.core.publisher.Mono;
  * @Date: Created in 2019/5/30  16:27
  * @Modified By:
  */
+@Slf4j
 @RestController
+@RefreshScope
 public class DemoController {
 
     @Autowired
@@ -48,18 +50,6 @@ public class DemoController {
     }
 
     /**#######################################消费服务的示例#################################################*/
-
-    /**
-     * 创建支持负载均衡的restTemplate
-     *
-     * @return
-     */
-    @Bean
-    @LoadBalanced
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
 
     @Autowired
     RestTemplate restTemplate;
@@ -96,13 +86,6 @@ public class DemoController {
         return result;
     }
 
-
-    @Bean
-    @LoadBalanced
-    public WebClient.Builder loadBalancedWebClientBuilder() {
-        return WebClient.builder();
-    }
-
     @Autowired
     private WebClient.Builder webClientBuilder;
 
@@ -133,6 +116,16 @@ public class DemoController {
         return result;
     }
 
+    /**
+     * ############################################nacos配置中心######################################################
+     */
+    @Value("${liutaospace.title:}")
+    private String title;
+
+    @GetMapping("/config/demo")
+    public String testConfig() {
+        return title;
+    }
 }
 
 
