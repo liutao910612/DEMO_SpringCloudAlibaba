@@ -17,6 +17,7 @@
 
     <modules>
         <module>nacos</module>
+        <module>sentinel</module>
     </modules>
     <dependencyManagement>
         <dependencies>
@@ -47,6 +48,11 @@
             <artifactId>lombok</artifactId>
             <version>1.18.2</version>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
